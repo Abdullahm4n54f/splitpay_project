@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import Navbar from '../components/Navbar';
 import MobileNav from '../components/MobileNav';
+import Footer from '../components/Footer';
 
 // ─── Sub-components ────────────────────────────────────────────────────────
 
@@ -266,6 +267,7 @@ const Friends = () => {
 
                 </div>
             </div>
+            <Footer />
             <MobileNav />
         </div>
     );

@@ -73,14 +73,14 @@ export const generateGroupPDF = (groupName, allExpenses, members, admin) => {
     } else {
         expenses.forEach(exp => {
             const desc = (exp.description || 'Item').toUpperCase();
-            const amt = `$${Number(exp.amount).toFixed(2)}`;
+            const amt = `Rs ${Number(exp.amount).toFixed(2)}`;
             leftRight(desc, amt, 8);
 
             // Show splits under each item
             if (exp.splits && exp.splits.length > 0) {
                 exp.splits.forEach(split => {
                     const name = `  ${(split.user?.name || 'Member').substring(0, 15)}`;
-                    const owed = `$${split.amountOwed.toFixed(2)}`;
+                    const owed = `Rs ${split.amountOwed.toFixed(2)}`;
                     doc.setFontSize(7);
                     doc.setTextColor(100);
                     doc.text(name, margin + 2, y);
@@ -102,7 +102,7 @@ export const generateGroupPDF = (groupName, allExpenses, members, admin) => {
     const totalSplits = expenses.reduce((sum, e) => sum + (e.splits?.length || 0), 0);
 
     doc.setFont('courier', 'bold');
-    leftRight('SUBTOTAL', `$${totalAmount.toFixed(2)}`, 9);
+    leftRight('SUBTOTAL', `Rs ${totalAmount.toFixed(2)}`, 9);
     y += 1;
 
     doc.setFont('courier', 'normal');
@@ -112,7 +112,7 @@ export const generateGroupPDF = (groupName, allExpenses, members, admin) => {
     dottedLine();
 
     doc.setFont('courier', 'bold');
-    leftRight('TOTAL AMOUNT', `$${totalAmount.toFixed(2)}`, 10);
+    leftRight('TOTAL AMOUNT', `Rs ${totalAmount.toFixed(2)}`, 10);
     y += 3;
 
     dottedLine();

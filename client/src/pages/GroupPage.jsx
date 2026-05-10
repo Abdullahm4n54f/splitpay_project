@@ -7,6 +7,7 @@ import { generateGroupPDF } from '../utils/generatePDF';
 import Sidebar from '../components/Sidebar';
 import Navbar from '../components/Navbar';
 import MobileNav from '../components/MobileNav';
+import Footer from '../components/Footer';
 
 const GroupPage = () => {
     const { id } = useParams();
@@ -91,7 +92,7 @@ const GroupPage = () => {
                 if (owed > 0) { formattedSplits.push({ user: memberId, amountOwed: owed }); check += owed; }
             }
             if (Math.abs(check - totalAmount) > 0.01) {
-                setAddBillError(`Splits ($${check.toFixed(2)}) ≠ total ($${totalAmount.toFixed(2)})`);
+                setAddBillError(`Splits (Rs ${check.toFixed(2)}) ≠ total (Rs ${totalAmount.toFixed(2)})`);
                 return;
             }
         } else {
@@ -216,7 +217,7 @@ const GroupPage = () => {
                                             <p className="text-xs text-gray-400">Submitted by {exp.paidBy?.name || 'someone'}</p>
                                         </div>
                                         <div className="flex items-center gap-3">
-                                            <p className="font-bold">${Number(exp.amount).toFixed(2)}</p>
+                                            <p className="font-bold">Rs {Number(exp.amount).toFixed(2)}</p>
                                             <button onClick={() => handleApprove(exp._id)}
                                                 className="bg-green-500 text-white text-sm px-4 py-2 rounded-full font-bold hover:bg-green-600">
                                                 Approve ✓
@@ -258,7 +259,7 @@ const GroupPage = () => {
                                                     </div>
                                                 </div>
                                                 <div className="text-right">
-                                                    <p className="font-bold text-lg">${Number(exp.amount).toFixed(2)}</p>
+                                                    <p className="font-bold text-lg">Rs {Number(exp.amount).toFixed(2)}</p>
                                                     {progress === 100 ? (
                                                         <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-bold">Done ✓</span>
                                                     ) : (
@@ -286,7 +287,7 @@ const GroupPage = () => {
                                                                 </div>
                                                                 <div>
                                                                     <p className="font-bold text-sm">{split.user?.name || 'Unknown'}</p>
-                                                                    <p className="text-xs text-gray-400">${split.amountOwed.toFixed(2)}</p>
+                                                                    <p className="text-xs text-gray-400">Rs {split.amountOwed.toFixed(2)}</p>
                                                                 </div>
                                                             </div>
                                                             <div className="flex items-center gap-2">
@@ -373,7 +374,7 @@ const GroupPage = () => {
                                 <input value={description} onChange={e => setDescription(e.target.value)}
                                     placeholder="Description (e.g. Dinner)" className="w-full rounded-full py-3 px-5 outline-none shadow-sm" />
                                 <input type="number" value={amount} onChange={e => setAmount(e.target.value)}
-                                    placeholder="Total Amount ($)" className="w-full rounded-full py-3 px-5 outline-none shadow-sm" />
+                                    placeholder="Total Amount (Rs)" className="w-full rounded-full py-3 px-5 outline-none shadow-sm" />
                                 <input type="url" value={attachmentUrl} onChange={e => setAttachmentUrl(e.target.value)}
                                     placeholder="Receipt image URL (optional)" className="w-full rounded-full py-3 px-5 outline-none shadow-sm" />
                                 {group.members.length > 1 && (
@@ -420,7 +421,7 @@ const GroupPage = () => {
                                             </div>
                                             <div className="text-right">
                                                 <p className={`font-bold text-sm ${net > 0 ? 'text-green-600' : net < 0 ? 'text-red-500' : 'text-gray-400'}`}>
-                                                    {net > 0 ? `+$${net.toFixed(2)}` : net < 0 ? `-$${Math.abs(net).toFixed(2)}` : 'Settled'}
+                                                    {net > 0 ? `+Rs ${net.toFixed(2)}` : net < 0 ? `-Rs ${Math.abs(net).toFixed(2)}` : 'Settled'}
                                                 </p>
                                             </div>
                                         </div>
@@ -473,6 +474,7 @@ const GroupPage = () => {
                     </div>
                 </div>
             )}
+            <Footer />
             <MobileNav />
         </div>
         </>

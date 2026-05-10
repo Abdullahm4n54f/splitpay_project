@@ -5,6 +5,7 @@ import { loginSuccess } from '../redux/authSlice';
 import Sidebar from '../components/Sidebar';
 import Navbar from '../components/Navbar';
 import MobileNav from '../components/MobileNav';
+import Footer from '../components/Footer';
 
 const Settings = () => {
     const dispatch = useDispatch();
@@ -176,6 +177,7 @@ const Settings = () => {
 
                 </div>
             </div>
+            <Footer />
             <MobileNav />
         </div>
     );
