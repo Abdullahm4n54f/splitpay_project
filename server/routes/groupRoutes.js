@@ -20,7 +20,7 @@ router.get('/', protect, gc.getUserGroups);
 
 // ─── DYNAMIC routes with :id ────────────────────────────────────────────────
 router.get('/:id', protect, gc.getGroupDetails);
-router.delete('/:id', protect, gc.deleteGroup);
+router.post('/delete/:id', protect, gc.deleteGroup);
 router.get('/:id/balances', protect, gc.getGroupBalances);
 
 module.exports = router;

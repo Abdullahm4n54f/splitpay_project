@@ -151,7 +151,7 @@ const GroupPage = () => {
     const handleDeleteGroup = async () => {
         if (!window.confirm("Are you sure you want to delete this group? This action cannot be undone and will delete all expenses.")) return;
         try {
-            await axios.delete(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/groups/${id}`, { headers });
+            await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/groups/delete/${id}`, {}, { headers });
             navigate('/dashboard');
         } catch (err) {
             alert(err.response?.data?.message || "Failed to delete group");
