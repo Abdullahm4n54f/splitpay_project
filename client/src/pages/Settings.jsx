@@ -176,8 +176,8 @@ const Settings = () => {
                     </div>
 
                 </div>
+                <Footer />
             </div>
-            <Footer />
             <MobileNav />
         </div>
     );

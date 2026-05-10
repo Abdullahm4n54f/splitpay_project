@@ -266,8 +266,8 @@ const Friends = () => {
                     </div>
 
                 </div>
+                <Footer />
             </div>
-            <Footer />
             <MobileNav />
         </div>
     );

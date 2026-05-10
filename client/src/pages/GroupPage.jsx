@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useSelector, useDispatch } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { setGroupData, setExpenses, addExpenseToStore } from '../redux/groupSlice';
 import { generateGroupPDF } from '../utils/generatePDF';
 import Sidebar from '../components/Sidebar';
@@ -11,6 +11,7 @@ import Footer from '../components/Footer';
 
 const GroupPage = () => {
     const { id } = useParams();
+    const navigate = useNavigate();
     const dispatch = useDispatch();
     const token = useSelector((state) => state.auth.token);
     const currentUser = useSelector((state) => state.auth.user);
