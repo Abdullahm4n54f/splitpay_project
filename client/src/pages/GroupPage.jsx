@@ -147,6 +147,16 @@ const GroupPage = () => {
         } catch (err) { alert(err.response?.data?.message || "Failed to invite"); }
     };
 
+    const handleDeleteGroup = async () => {
+        if (!window.confirm("Are you sure you want to delete this group? This action cannot be undone and will delete all expenses.")) return;
+        try {
+            await axios.delete(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/groups/${id}`, { headers });
+            navigate('/dashboard');
+        } catch (err) {
+            alert(err.response?.data?.message || "Failed to delete group");
+        }
+    };
+
     // ─── Helpers ─────────────────────────────────────────────────────────────
 
     const getProgress = (exp) => {
@@ -189,6 +199,12 @@ const GroupPage = () => {
                             <button onClick={() => setShowInviteModal(true)}
                                 className="bg-[#D9F99D] text-black font-bold px-6 py-3 rounded-full hover:bg-[#bef068] transition">
                                 + Invite Member
+                            </button>
+                        )}
+                        {isAdmin && (
+                            <button onClick={handleDeleteGroup}
+                                className="bg-red-100 text-red-700 font-bold px-6 py-3 rounded-full hover:bg-red-200 transition">
+                                Delete Group
                             </button>
                         )}
                         <button onClick={() => generateGroupPDF(group.groupName, approvedExpenses, group.members, group.admin)}

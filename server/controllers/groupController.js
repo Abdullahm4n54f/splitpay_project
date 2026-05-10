@@ -228,6 +228,34 @@ const getGroupBalances = async (req, res) => {
     }
 };
 
+// ─── DELETE ──────────────────────────────────────────────────────────────────
+
+// DELETE /api/groups/:id — delete a group and its expenses
+const deleteGroup = async (req, res) => {
+    try {
+        const groupId = req.params.id;
+        const group = await Group.findById(groupId);
+
+        if (!group) return res.status(404).json({ message: "Group not found" });
+
+        // Only the admin can delete the group
+        if (group.admin.toString() !== req.user.userId) {
+            return res.status(403).json({ message: "Only the admin can delete this group" });
+        }
+
+        // Delete all expenses associated with the group
+        await Expense.deleteMany({ groupId });
+
+        // Delete the group
+        await Group.findByIdAndDelete(groupId);
+
+        res.status(200).json({ message: "Group and its expenses deleted successfully" });
+    } catch (error) {
+        console.log("Error deleting group:", error);
+        res.status(500).json({ message: "Server error deleting group" });
+    }
+};
+
 module.exports = {
     createGroup,
     getUserGroups,
@@ -237,5 +265,6 @@ module.exports = {
     acceptGroupInvite,
     declineGroupInvite,
     getMyInvites,
-    getGroupBalances
+    getGroupBalances,
+    deleteGroup
 };
