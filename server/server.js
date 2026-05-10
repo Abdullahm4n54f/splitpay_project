@@ -10,8 +10,13 @@ const userRoutes = require('./routes/userRoutes');
 
 const app = express();
 
-// basic middleware
-app.use(cors());
+// Explicitly allow DELETE, PUT etc. so browser preflight requests succeed
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+app.options('*', cors()); // handle all preflight requests
 app.use(express.json());
 
 // connect to MongoDB
