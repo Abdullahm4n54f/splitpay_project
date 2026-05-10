@@ -2,13 +2,8 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
 export const generateGroupPDF = (groupName, allExpenses, members, admin) => {
-    // We want to keep the PDF receipt clean, so we filter out any bills that have been completely settled.
-    // If the number of settled splits is less than the total splits, it means someone still owes money!
-    const expenses = allExpenses.filter(exp => {
-        const totalSplits = exp.splits?.length || 0;
-        const settledCount = exp.settledSplits?.length || 0;
-        return settledCount < totalSplits;
-    });
+    // Show all expenses passed to the function so the receipt is never confusingly empty.
+    const expenses = allExpenses;
     const doc = new jsPDF({
         unit: 'mm',
         format: [80, 200] // receipt width, auto-extend height
@@ -80,7 +75,7 @@ export const generateGroupPDF = (groupName, allExpenses, members, admin) => {
             if (exp.splits && exp.splits.length > 0) {
                 exp.splits.forEach(split => {
                     const name = `  ${(split.user?.name || 'Member').substring(0, 15)}`;
-                    const owed = `Rs ${split.amountOwed.toFixed(2)}`;
+                    const owed = `Rs ${Number(split.amountOwed).toFixed(2)}`;
                     doc.setFontSize(7);
                     doc.setTextColor(100);
                     doc.text(name, margin + 2, y);
