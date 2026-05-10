@@ -15,12 +15,11 @@ const createGroup = async (req, res) => {
         const newGroup = new Group({
             groupName,
             members: allMembers,
-            admin: req.user.userId // creator is admin
+            admin: req.user.userId
         });
 
         await newGroup.save();
 
-        // Return populated so frontend has member names
         const populated = await Group.findById(newGroup._id)
             .populate('members', 'name email avatar')
             .populate('admin', 'name email avatar');
@@ -96,7 +95,6 @@ const addComment = async (req, res) => {
 
 // ─── INVITES ─────────────────────────────────────────────────────────────────
 
-// POST /api/groups/invite — admin invites a user to the group
 const inviteToGroup = async (req, res) => {
     try {
         const { groupId, userId } = req.body;
@@ -104,12 +102,10 @@ const inviteToGroup = async (req, res) => {
         const group = await Group.findById(groupId);
         if (!group) return res.status(404).json({ message: "Group not found" });
 
-        // Only admin can invite
         if (group.admin.toString() !== req.user.userId) {
             return res.status(403).json({ message: "Only the group admin can invite members" });
         }
 
-        // Check if already a member or already invited
         if (group.members.some(m => m.toString() === userId)) {
             return res.status(400).json({ message: "User is already a member" });
         }
@@ -133,7 +129,6 @@ const inviteToGroup = async (req, res) => {
     }
 };
 
-// POST /api/groups/accept-invite — user accepts an invite
 const acceptGroupInvite = async (req, res) => {
     try {
         const { groupId } = req.body;
@@ -142,12 +137,10 @@ const acceptGroupInvite = async (req, res) => {
         const group = await Group.findById(groupId);
         if (!group) return res.status(404).json({ message: "Group not found" });
 
-        // Must be in pending invites
         if (!group.pendingInvites.some(m => m.toString() === userId)) {
             return res.status(400).json({ message: "No pending invite found" });
         }
 
-        // Move from pendingInvites to members
         group.pendingInvites = group.pendingInvites.filter(m => m.toString() !== userId);
         group.members.push(userId);
         await group.save();
@@ -159,7 +152,6 @@ const acceptGroupInvite = async (req, res) => {
     }
 };
 
-// POST /api/groups/decline-invite — user declines an invite
 const declineGroupInvite = async (req, res) => {
     try {
         const { groupId } = req.body;
@@ -176,7 +168,6 @@ const declineGroupInvite = async (req, res) => {
     }
 };
 
-// GET /api/groups/my-invites — get all groups where user has a pending invite
 const getMyInvites = async (req, res) => {
     try {
         const groups = await Group.find({ pendingInvites: req.user.userId })
@@ -192,7 +183,6 @@ const getMyInvites = async (req, res) => {
 
 // ─── BALANCES ────────────────────────────────────────────────────────────────
 
-// GET /api/groups/:id/balances — calculate per-member balance for a group
 const getGroupBalances = async (req, res) => {
     try {
         const groupId = req.params.id;
@@ -202,7 +192,6 @@ const getGroupBalances = async (req, res) => {
 
         const expenses = await Expense.find({ groupId });
 
-        // Initialize balances: positive = owed money, negative = owes money
         const balances = {};
         group.members.forEach(m => {
             balances[m._id.toString()] = { user: m, net: 0 };
@@ -211,12 +200,12 @@ const getGroupBalances = async (req, res) => {
         expenses.forEach(exp => {
             const payerId = exp.paidBy.toString();
             if (balances[payerId]) {
-                balances[payerId].net += exp.amount; // payer is owed the full amount
+                balances[payerId].net += exp.amount;
             }
             exp.splits.forEach(split => {
                 const splitUserId = split.user.toString();
                 if (balances[splitUserId]) {
-                    balances[splitUserId].net -= split.amountOwed; // each person owes their split
+                    balances[splitUserId].net -= split.amountOwed;
                 }
             });
         });
@@ -230,7 +219,6 @@ const getGroupBalances = async (req, res) => {
 
 // ─── DELETE ──────────────────────────────────────────────────────────────────
 
-// DELETE /api/groups/:id — delete a group and its expenses
 const deleteGroup = async (req, res) => {
     try {
         const groupId = req.params.id;
@@ -238,15 +226,11 @@ const deleteGroup = async (req, res) => {
 
         if (!group) return res.status(404).json({ message: "Group not found" });
 
-        // Only the admin can delete the group
         if (group.admin.toString() !== req.user.userId) {
             return res.status(403).json({ message: "Only the admin can delete this group" });
         }
 
-        // Delete all expenses associated with the group
         await Expense.deleteMany({ groupId });
-
-        // Delete the group
         await Group.findByIdAndDelete(groupId);
 
         res.status(200).json({ message: "Group and its expenses deleted successfully" });
