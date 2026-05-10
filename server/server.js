@@ -1,3 +1,4 @@
+```javascript
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -16,21 +17,15 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
 }));
-app.options('*', cors()); // handle all preflight requests
+app.options('*', cors());
 app.use(express.json());
-
-// connect to MongoDB
-const { MongoMemoryServer } = require('mongodb-memory-server');
 
 const connectDB = async () => {
     if (process.env.MONGO_URI && !process.env.MONGO_URI.includes('your_username')) {
         try {
-            // Sometimes local ISPs block the standard MongoDB SRV lookup.
-            // To get around this, we manually resolve the connection using Google's DNS servers.
             const resolver = new Resolver();
             resolver.setServers(['8.8.8.8', '8.8.4.4']);
 
-            // Extract hostname from the SRV URI
             const srvMatch = process.env.MONGO_URI.match(/mongodb\+srv:\/\/([^:]+):([^@]+)@([^/]+)/);
             if (srvMatch) {
                 const [, dbUser, dbPass, srvHost] = srvMatch;
@@ -40,7 +35,6 @@ const connectDB = async () => {
                 let txtRecords = [];
                 try { txtRecords = await resolver.resolveTxt(srvHost); } catch(e) {}
 
-                // Build direct connection string from the SRV records
                 const hosts = srvRecords.map(r => `${r.name}:${r.port}`).join(',');
                 const txtOptions = txtRecords.flat().join('&');
                 const directUri = `mongodb://${dbUser}:${dbPass}@${hosts}/splitpay?ssl=true&authSource=admin&${txtOptions}&retryWrites=true&w=majority`;
@@ -52,26 +46,18 @@ const connectDB = async () => {
                 return;
             }
 
-            // If not SRV format, try direct connect
             await mongoose.connect(process.env.MONGO_URI, {
                 serverSelectionTimeoutMS: 10000
             });
             console.log("✅ Connected to MongoDB Atlas successfully!");
             return;
         } catch (err) {
-            console.log("⚠️  Atlas connection failed:", err.message);
-            console.log("   Falling back to In-Memory MongoDB...");
+            console.log("❌ Fatal: MongoDB Atlas connection failed:", err.message);
+            process.exit(1);
         }
-    }
-
-    // Fallback to in-memory
-    try {
-        const mongoServer = await MongoMemoryServer.create();
-        const uri = mongoServer.getUri();
-        await mongoose.connect(uri);
-        console.log("✅ Connected to In-Memory MongoDB successfully!");
-    } catch (err) {
-        console.log("❌ Fatal: Could not connect to any database:", err.message);
+    } else {
+        console.log("❌ Fatal: MONGO_URI is not set or contains placeholder values");
+        process.exit(1);
     }
 };
 
@@ -95,3 +81,4 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
+```
