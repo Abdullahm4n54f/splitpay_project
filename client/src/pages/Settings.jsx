@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { useSelector, useDispatch } from 'react-redux';
 import { loginSuccess } from '../redux/authSlice';
@@ -34,6 +34,11 @@ const Settings = () => {
             return;
         }
 
+        if (avatar && !avatar.trim().match(/^https?:\/\/.+/)) {
+            setErrorMsg("Please enter a valid image URL (must start with http:// or https://)");
+            return;
+        }
+
         setLoading(true);
         try {
             const payload = { name, avatar };
@@ -44,7 +49,6 @@ const Settings = () => {
 
             const res = await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/users/settings`, payload, { headers });
 
-            // Update Redux so Navbar shows new name/avatar immediately
             dispatch(loginSuccess({ user: res.data.user, token }));
 
             setSuccessMsg("Settings saved successfully!");
@@ -71,7 +75,6 @@ const Settings = () => {
 
                 <div className="max-w-2xl space-y-6">
 
-                    {/* Profile Card */}
                     <div className="bg-white p-8 rounded-[40px] shadow-sm">
                         <div className="flex items-center gap-6 mb-8">
                             <img
@@ -168,7 +171,6 @@ const Settings = () => {
                         </form>
                     </div>
 
-                    {/* Danger Zone */}
                     <div className="bg-white p-8 rounded-[40px] shadow-sm border border-red-100">
                         <h3 className="text-xl font-bold text-red-600 mb-2">Account Info</h3>
                         <p className="text-gray-500 text-sm mb-4">Logged in as <strong>{user?.email}</strong></p>
