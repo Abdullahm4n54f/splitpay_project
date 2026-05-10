@@ -42,7 +42,7 @@ const Settings = () => {
                 payload.newPassword = newPassword;
             }
 
-            const res = await axios.put('http://localhost:5000/api/users/settings', payload, { headers });
+            const res = await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/users/settings`, payload, { headers });
 
             // Update Redux so Navbar shows new name/avatar immediately
             dispatch(loginSuccess({ user: res.data.user, token }));

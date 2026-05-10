@@ -20,7 +20,7 @@ const Register = () => {
             return;
         }
 
-        axios.post('http://localhost:5000/api/users/register', { name, email, password })
+        axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/users/register`, { name, email, password })
             .then(() => {
                 alert("Account created! Now please login.");
                 navigate('/login');

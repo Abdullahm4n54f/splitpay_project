@@ -8,7 +8,7 @@ const GroupRedirect = () => {
     const token = useSelector((state) => state.auth.token);
 
     useEffect(() => {
-        axios.get('http://localhost:5000/api/groups', {
+        axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/groups`, {
             headers: { Authorization: `Bearer ${token}` }
         })
         .then(res => {

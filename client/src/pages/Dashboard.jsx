@@ -24,13 +24,13 @@ const Dashboard = () => {
     const headers = { Authorization: `Bearer ${token}` };
 
     useEffect(() => {
-        axios.get('http://localhost:5000/api/groups', { headers })
+        axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/groups`, { headers })
             .then(async (res) => {
                 setGroups(res.data);
                 let totalOwe = 0, totalOwed = 0;
                 try {
                     const expPromises = res.data.map(g =>
-                        axios.get(`http://localhost:5000/api/expenses/${g._id}`, { headers })
+                        axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/expenses/${g._id}`, { headers })
                     );
                     const expResponses = await Promise.all(expPromises);
                     expResponses.forEach(r => {
@@ -64,11 +64,11 @@ const Dashboard = () => {
             })
             .catch(err => console.log(err));
 
-        axios.get('http://localhost:5000/api/groups/my-invites', { headers })
+        axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/groups/my-invites`, { headers })
             .then(res => setPendingInvites(res.data))
             .catch(err => console.log(err));
 
-        axios.get('http://localhost:5000/api/users/friends', { headers })
+        axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/users/friends`, { headers })
             .then(res => setFriends(res.data.friends || []))
             .catch(err => console.log(err));
 
@@ -79,7 +79,7 @@ const Dashboard = () => {
         setErrorMsg('');
         if (!newGroupName) { setErrorMsg("Please enter a name for the split group"); return; }
 
-        axios.post('http://localhost:5000/api/groups', { groupName: newGroupName, members: [] }, { headers })
+        axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/groups`, { groupName: newGroupName, members: [] }, { headers })
         .then((res) => {
             setShowModal(false);
             setNewGroupName('');
@@ -90,7 +90,7 @@ const Dashboard = () => {
 
     const handleAcceptInvite = async (groupId) => {
         try {
-            await axios.post('http://localhost:5000/api/groups/accept-invite', { groupId }, { headers });
+            await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/groups/accept-invite`, { groupId }, { headers });
             setPendingInvites(prev => prev.filter(g => g._id !== groupId));
             navigate(`/group/${groupId}`);
         } catch (err) { console.log(err); }
@@ -98,7 +98,7 @@ const Dashboard = () => {
 
     const handleDeclineInvite = async (groupId) => {
         try {
-            await axios.post('http://localhost:5000/api/groups/decline-invite', { groupId }, { headers });
+            await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/groups/decline-invite`, { groupId }, { headers });
             setPendingInvites(prev => prev.filter(g => g._id !== groupId));
         } catch (err) { console.log(err); }
     };

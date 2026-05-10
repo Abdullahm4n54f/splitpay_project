@@ -33,13 +33,13 @@ const GroupPage = () => {
     const headers = { Authorization: `Bearer ${token}` };
 
     const fetchData = () => {
-        axios.get(`http://localhost:5000/api/groups/${id}`, { headers })
+        axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/groups/${id}`, { headers })
             .then(res => dispatch(setGroupData(res.data)))
             .catch(err => console.log(err));
-        axios.get(`http://localhost:5000/api/expenses/${id}`, { headers })
+        axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/expenses/${id}`, { headers })
             .then(res => dispatch(setExpenses(res.data)))
             .catch(err => console.log(err));
-        axios.get(`http://localhost:5000/api/groups/${id}/balances`, { headers })
+        axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/groups/${id}/balances`, { headers })
             .then(res => setBalances(res.data))
             .catch(err => console.log(err));
     };
@@ -51,7 +51,7 @@ const GroupPage = () => {
 
     useEffect(() => {
         if (id) {
-            axios.get(`http://localhost:5000/api/groups/${id}/balances`, { headers })
+            axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/groups/${id}/balances`, { headers })
                 .then(res => setBalances(res.data)).catch(() => {});
         }
     }, [expenses]);
@@ -61,7 +61,7 @@ const GroupPage = () => {
         if (!inviteSearch.trim()) { setInviteResults([]); return; }
         const timer = setTimeout(async () => {
             try {
-                const res = await axios.get(`http://localhost:5000/api/users/search?q=${encodeURIComponent(inviteSearch)}`, { headers });
+                const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/users/search?q=${encodeURIComponent(inviteSearch)}`, { headers });
                 const memberIds = new Set(group?.members?.map(m => m._id) || []);
                 const pendingIds = new Set(group?.pendingInvites?.map(m => m._id) || []);
                 setInviteResults(res.data.filter(u => !memberIds.has(u._id) && !pendingIds.has(u._id)));
@@ -104,7 +104,7 @@ const GroupPage = () => {
                 rem -= per;
             });
         }
-        axios.post('http://localhost:5000/api/expenses', {
+        axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/expenses`, {
             description, amount: totalAmount, groupId: id, splits: formattedSplits,
             attachment: attachmentUrl || null
         }, { headers })
@@ -117,14 +117,14 @@ const GroupPage = () => {
 
     const handleApprove = async (expenseId) => {
         try {
-            const res = await axios.put(`http://localhost:5000/api/expenses/approve/${expenseId}`, {}, { headers });
+            const res = await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/expenses/approve/${expenseId}`, {}, { headers });
             dispatch(setExpenses(expenses.map(e => e._id === expenseId ? res.data : e)));
         } catch (err) { alert(err.response?.data?.message || "Failed to approve"); }
     };
 
     const handleSettle = async (expenseId, userId) => {
         try {
-            const res = await axios.put(`http://localhost:5000/api/expenses/settle/${expenseId}`, { userId }, { headers });
+            const res = await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/expenses/settle/${expenseId}`, { userId }, { headers });
             dispatch(setExpenses(expenses.map(e => e._id === expenseId ? res.data : e)));
         } catch (err) { alert(err.response?.data?.message || "Failed to settle"); }
     };
@@ -132,7 +132,7 @@ const GroupPage = () => {
     const handleAddComment = (e) => {
         e.preventDefault();
         if (!commentText.trim()) return;
-        axios.post('http://localhost:5000/api/groups/comment', {
+        axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/groups/comment`, {
             groupId: id, text: commentText, replyTo: replyTo?.index ?? null
         }, { headers })
         .then(res => { dispatch(setGroupData(res.data)); setCommentText(''); setReplyTo(null); })
@@ -141,7 +141,7 @@ const GroupPage = () => {
 
     const handleInvite = async (userId) => {
         try {
-            const res = await axios.post('http://localhost:5000/api/groups/invite', { groupId: id, userId }, { headers });
+            const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/groups/invite`, { groupId: id, userId }, { headers });
             dispatch(setGroupData(res.data));
             setInviteResults(prev => prev.filter(u => u._id !== userId));
         } catch (err) { alert(err.response?.data?.message || "Failed to invite"); }

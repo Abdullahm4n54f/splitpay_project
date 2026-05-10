@@ -45,7 +45,7 @@ const Friends = () => {
     // Fetch friends and pending requests on load
     const loadFriends = useCallback(async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/users/friends', { headers });
+            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/users/friends`, { headers });
             setFriends(res.data.friends || []);
             setFriendRequests(res.data.friendRequests || []);
         } catch (err) {
@@ -66,7 +66,7 @@ const Friends = () => {
         const timer = setTimeout(async () => {
             setSearchLoading(true);
             try {
-                const res = await axios.get(`http://localhost:5000/api/users/search?q=${encodeURIComponent(searchTerm)}`, { headers });
+                const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/users/search?q=${encodeURIComponent(searchTerm)}`, { headers });
                 // Filter out existing friends from results
                 const friendIds = new Set(friends.map(f => f._id));
                 setSearchResults(res.data.filter(u => !friendIds.has(u._id) && u._id !== currentUser._id));
@@ -81,7 +81,7 @@ const Friends = () => {
 
     const handleSendRequest = async (targetUserId) => {
         try {
-            await axios.post('http://localhost:5000/api/users/friend-request', { targetUserId }, { headers });
+            await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/users/friend-request`, { targetUserId }, { headers });
             setSentRequests(prev => new Set(prev).add(targetUserId));
         } catch (err) {
             const msg = err.response?.data?.message || "Failed to send request";
@@ -91,7 +91,7 @@ const Friends = () => {
 
     const handleAccept = async (requesterId) => {
         try {
-            const res = await axios.post('http://localhost:5000/api/users/accept-friend', { requesterId }, { headers });
+            const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/users/accept-friend`, { requesterId }, { headers });
             setFriends(res.data.friends || []);
             setFriendRequests(res.data.friendRequests || []);
         } catch (err) {
@@ -101,7 +101,7 @@ const Friends = () => {
 
     const handleDecline = async (requesterId) => {
         try {
-            await axios.post('http://localhost:5000/api/users/decline-friend', { requesterId }, { headers });
+            await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/users/decline-friend`, { requesterId }, { headers });
             setFriendRequests(prev => prev.filter(r => r._id !== requesterId));
         } catch (err) {
             console.log("Error declining:", err);
